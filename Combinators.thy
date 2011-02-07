@@ -4,9 +4,9 @@ theory Combinator_Calculus
 imports Main
 begin
 
-text {*  In this article we give a Curry-Howard isomorphism
-  inspired presentation of abstract axiom systems of typed 
-  combinators for thinking about logic. *}
+text {*  In this article we use the Curry-Howard isomorphism
+  to provide a $\lambda$-calculus based \emph{Domain Specific Language} (DSL) for rapidly proving theorems 
+  in intuitionistic logic. *}
 
 section {* Preliminaries *}
 
@@ -15,9 +15,6 @@ text {* First, we will hijack the notation for @{term "op :"} so we can
   combos in our locale for typed combinator calculus. *}
 
 no_notation
-  "op :"  ("op \<in>") and
-  "op :"  ("(_/ \<in> _)" [50, 51] 50) and 
-  "op :"  ("(_/ : _)" [50, 51] 50) and 
   comp  (infixl "\<circ>" 55) and
   Not  ("\<not> _" [40] 40)
 
@@ -31,7 +28,7 @@ locale SKI =
   fixes
        vdash :: "'a \<times> 'b \<Rightarrow> bool"   ("\<turnstile> _" [10] 10)
     and impl :: "'b \<Rightarrow> 'b \<Rightarrow> 'b"     (infixr "\<rightarrow>" 85) 
-    and   ap :: "'a \<Rightarrow> 'a \<Rightarrow> 'a"       (infixl "\<cdot>" 85)
+    and   ap :: "'a \<Rightarrow> 'a \<Rightarrow> 'a"     (infixl "\<cdot>" 85)
     and    S :: "'a"
     and    K :: "'a" 
   assumes
@@ -51,15 +48,14 @@ end
 
 section {* SKI Embedding *}
 
-text {* The Curry Howard isomorphism, in its most basic form, 
+text {* The Curry-Howard isomorphism, in its most basic form, 
 is the observation that the theorems of minimal logic correspond to programs 
-one may express in the pure typed functional $\lambda$ calculus. *}
+one may express in the pure typed functional $\lambda$-calculus. *}
 
 text {* In this section we develop machinery which will allow us to give programs
 as proofs for propositions in minimal logic.  We accomplish this by exhibiting two 
 type-equivalent embeddings the $\lambda$ calculus in the SKI calculus, due to Sch\"onfinkel. 
-We might eventually want to adapt Induct/Comb.thy for what we do below.  
-On the other hand, since we are not really interested in the Church-Rosser confluence 
+Unlike the theory developed in  "~~/src/HOL/Induct/Comb", we are not really interested in the Church-Rosser confluence 
 theorem here, it may be best to leave our developments seperate.  *}
 
 datatype 'a ski = 
@@ -90,8 +86,8 @@ primrec Schonfinkel_free :: "'a ski \<Rightarrow> 'a set" ("free") where
 fun Schonfinkel :: "'a \<Rightarrow> 'a ski \<Rightarrow> 'a ski"  ("\<Delta>")
   where 
      "(\<Delta> x) A = (if (x ~: free A) then (K'\<bullet>A) else
-        (case A of   <y> \<Rightarrow> I' |
-                   (C\<bullet>D) \<Rightarrow> (S'\<bullet>((\<Delta> x) C)\<bullet>((\<Delta> x) D))))"
+                (case A of <y>   \<Rightarrow> I' |
+                           (C\<bullet>D) \<Rightarrow> (S'\<bullet>((\<Delta> x) C)\<bullet>((\<Delta> x) D))))"
 
 --{* Repeated abstractions *}
 primrec LamAbs0 :: "'a list \<Rightarrow> 'a ski \<Rightarrow> 'a ski"  ("(\<Lambda>0_/ _)" [50, 51] 50)
@@ -133,7 +129,6 @@ by (simp, metis Ityp Ktyp Styp mp)
 --{* Sanity check II: $B$ Combinator using the long embedding *}
 lemma "\<turnstile> \<rhd> (\<Lambda>0[X,Y,Z] <X>\<bullet>(<Y>\<bullet><Z>)) : (\<chi> \<rightarrow> \<psi>) \<rightarrow> (\<phi> \<rightarrow> \<chi>) \<rightarrow> \<phi> \<rightarrow> \<psi>"
   apply simp
-  --{* Rediculous subgoal! :D *}
   apply blast
 done
 
@@ -145,7 +140,7 @@ text {* While we do not have a formal verification of this, in practice the
         two embeddings establish equivalent types under interpretation.
 
         As an aside, we now have at our disposal the sexiest way of proving theorems in 
-        minimal logic: exhibit the combinator associated with the desired theorem in the $\lambda$ calculus, 
+        minimal logic: exhibit the combinator associated with the desired theorem in the $\lambda$-calculus, 
         and then prove its $SKI$ embedding has the desired type.  One cannot possibly perform this
         with pencil and paper -- but we aren't using pencil and paper, are we?  Since programming and
         type inference are easy, this is arguable the fastest way to coerce the computer to prove
@@ -300,8 +295,7 @@ no_notation
    LamAbs ("(\<Lambda>_/ _)" [50, 51] 50) 
 
 notation
-  "op :"  ("op \<in>") and
-  "op :"  ("(_/ \<in> _)" [50, 51] 50) and 
-  "op :"  ("(_/ : _)" [50, 51] 50) and 
   comp  (infixl "\<circ>" 55) and
   Not  ("\<not> _" [40] 40)
+
+end
